@@ -36,5 +36,3 @@ python main.py
 - **Spacebar**: Fire laser.
 - **Esc**: Quit game.
 
-## License
-This project is open-source and available under the [MIT License](LICENSE).
