@@ -25,6 +25,9 @@ class Asteroid(CircleShape):
     def check_collision(self, circleshape_obj):
         return super().check_collision(circleshape_obj)
     
+    def getPoints(self):
+        return self.points
+    
     def split(self):
         self.kill()
 

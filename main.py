@@ -1,16 +1,16 @@
 import pygame
+import sys
 from constants import *
 from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 
-
 def main():
 	# screen setup
 	pygame.init()
+	font = pygame.font.Font(None, 36)
 	screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-	font =  pygame.font.Font(None, 36)	
 	
 	print("Starting Asteroids!")
 	print(f"Screen width: {SCREEN_WIDTH}")
@@ -34,14 +34,14 @@ def main():
 
 	player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 	asteroid_field = AsteroidField()
-
+	
 	score = 0
 
 	# Game Loop
 	while(True):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				return
+				running = False
 			
 		screen.fill("black")
 
@@ -49,7 +49,9 @@ def main():
 
 		for asteroid in asteroids:
 			if asteroid.check_collision(player):
-				game_over(screen, score)
+				print("Game Over!")
+				game_over(screen, score, player)
+				player, score = reset_game(updatable, drawable, asteroids, shots)
 
 		for asteroid in asteroids:
 			for shot in shots:
@@ -57,7 +59,7 @@ def main():
 					shot.kill() 
 					asteroid.split()
 					# Keep track of the score
-					score += asteroid.points
+					score += asteroid.getPoints()
 				  
 		for obj in drawable:
 			obj.draw(screen)
@@ -71,10 +73,8 @@ def main():
 		# shoud limit to 60 FPS for this project
 		dt = clock.tick(60) / 1000
 
-pygame.quit()
 
-
-def game_over(screen, score):
+def game_over(screen, score, player):
 	screen.fill("black")
 	font =  pygame.font.Font(None, 36)	
 	game_over_text = font.render("GAME OVER - Press R to Restart or Esc to Quit", True, "white")
@@ -90,13 +90,28 @@ def game_over(screen, score):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
-				return
+				sys.exit()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
+					print("Exit.")
 					pygame.quit()
-					return
+					sys.exit()
 				if event.key == pygame.K_r:
-					main()
+					return False
+
+
+def reset_game(updatable, drawable, asteroids, shots):
+    # Clear the "figures" from the screen
+    updatable.empty()
+    drawable.empty()
+    asteroids.empty()
+    shots.empty()
+
+    # Re-initialize the player and field
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    asteroid_field = AsteroidField()
+    
+    return player, 0  # Return new player and reset score to 0
 
 
 if __name__ == "__main__":
